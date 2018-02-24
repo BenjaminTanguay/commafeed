@@ -32,3 +32,4 @@ src/main/app/lib
 
 # Macs
 *.DS_Store
+/bin/
