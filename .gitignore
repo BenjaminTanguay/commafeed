@@ -32,3 +32,5 @@ src/main/app/lib
 
 # Macs
 *.DS_Store
+config.dev.yml
+src/main/java/com/commafeed/backend/feed/FeedQueues.java

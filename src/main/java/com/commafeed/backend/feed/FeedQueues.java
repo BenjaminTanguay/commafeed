@@ -37,7 +37,7 @@ public class FeedQueues {
 
 	private Meter refill;
 
-	//This constructor ir for testing purpose
+	/*This constructor ir for testing purpose
     @Inject
     public FeedQueues(Queue<FeedRefreshContext> addQueue, Queue<FeedRefreshContext> takeQueue, Queue<Feed> giveBackQueue ,SessionFactory sessionFactory, FeedDAO feedDAO, CommaFeedConfiguration config, MetricRegistry metrics) {
         this(sessionFactory, feedDAO, config, metrics);
@@ -46,7 +46,7 @@ public class FeedQueues {
         this.takeQueue = takeQueue;
         this.giveBackQueue = giveBackQueue;
     }
-
+	*/
 	@Inject
 	public FeedQueues(SessionFactory sessionFactory, FeedDAO feedDAO, CommaFeedConfiguration config, MetricRegistry metrics) {
 		this.sessionFactory = sessionFactory;
