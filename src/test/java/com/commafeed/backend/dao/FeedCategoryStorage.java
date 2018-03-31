@@ -142,7 +142,6 @@ public class FeedCategoryStorage extends FeedCategoryDAO{
 			System.out.println("Item Doesnt Exist");
 		}
 		return expectedCategory;
-		
 	}
 
 	//new should be the same as the old

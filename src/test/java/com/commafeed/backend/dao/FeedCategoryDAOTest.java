@@ -71,6 +71,21 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
     	//fork lift
     	feedCategoryStorage.forklift();
     	feedCategoryStorage.print("Copied List");
+    	assertEquals(0, feedCategoryStorage.checkConsistency());
+    	
+    	//shadow writes: any changes are written directly to old
+		//consistency should be checked after each write
+    	FeedCategory newCategory = createFakeCategory();
+		feedCategoryStorage.saveOrUpdate(newCategory);
+		assertEquals(0, feedCategoryStorage.checkConsistency());
+		
+		//Shadow Reads for Validation (read will access both old and new)
+		// change the hash only
+		//arrayStorage.testOnlyPutHashOnly("123", "Milk 4.99");
+		//The end user still gets the correct result
+		//assertEquals("Milk 4.99", arrayStorage.barcode("123"));
+		//we ensure that that inconsistency is fixed
+		//assertEquals(0, arrayStorage.checkConsistency());
     	//assertEquals(testingList,feedCategoryDAO.findAll(testUser));
     }
     
@@ -92,10 +107,7 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
     	
     	
     }
-    
-    
 
-    
     private void shadowWrite(){
     	
     	//feedCategoryDAO.saveOrUpdate(newCategory);
