@@ -26,6 +26,7 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
 
 	private static UserDAO userDAO;							
 	private static FeedCategoryDAO feedCategoryDAO;	
+	private static List<FeedCategory> testFileList;
 	private static FeedCategoryStorage feedCategoryStorage;
 	private static List<Class> classes = new ArrayList<>();
 	private static User testUser;
@@ -46,10 +47,8 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
 		classes.add(FeedEntry.class);
 		classes.add(FeedEntryContent.class);
 		classes.add(FeedEntryTag.class);
-		beginTransaction();
 		feedCategoryStorage = new FeedCategoryStorage(createSessionFactory(classes), testUser);
-		feedCategoryStorage.loadStorage();
-		closeTransaction();
+		
     }
 
     @Before
@@ -57,23 +56,25 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
         // This opens up the session with the database before each individual
         // tests.
         // It can run more than one query at a time.
-        
+    	beginTransaction();
     }
 
     @After
     public void afterEachTest() {
         // This closes up the session with the database after each
         // individual tests.
-       
+    	closeTransaction();
     }
 
-    //@Test
+    @Test
     public void forkliftTest() {
     	//fork lift
+    	feedCategoryStorage.forklift();
+    	feedCategoryStorage.print("Copied List");
     	//assertEquals(testingList,feedCategoryDAO.findAll(testUser));
     }
     
-    @Test
+    //@Test
     public void shadowWriteTest(){
     	//forklift();
     	//shadow write
@@ -88,8 +89,7 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
     	//shadow read
     	
     	//check inconsistency
-    	feedCategoryStorage.forklift();
-    	feedCategoryStorage.print("Copied List");
+    	
     	
     }
     
