@@ -1,8 +1,8 @@
 package com.commafeed.backend.dao.FeedEntryDAOTest;
 
-import com.commafeed.frontend.model.Entries;
+import com.commafeed.backend.model.FeedEntry;
 
 public interface StorageFeedEntryDAO {
 
-    Entries entry(int key, Entries entry);
+    FeedEntry feedEntry(int key, FeedEntry feedEntry);
 }

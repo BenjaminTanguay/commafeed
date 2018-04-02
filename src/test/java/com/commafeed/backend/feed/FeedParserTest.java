@@ -145,7 +145,7 @@ public class FeedParserTest {
         fakeMockSyncEntry.setUri("http://this-is-a-website.com");
         return  fakeMockSyncEntry;
     }
-    // Helper function to set a fake entry...
+    // Helper function to set a fake feedEntry...
     private SyndEntry makeFakeSyndEntry(){
         SyndEntry fakeSyncEntry = new SyndEntryImpl();
         SyndContent fakeContent = new SyndContentImpl();

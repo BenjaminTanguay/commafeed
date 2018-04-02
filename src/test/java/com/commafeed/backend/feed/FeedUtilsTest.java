@@ -43,18 +43,18 @@ public class FeedUtilsTest {
 
 	@Test
 	public void testToAbsoluteUrl() {
-		String expected = "http://a.com/blog/entry/1";
+		String expected = "http://a.com/blog/feedEntry/1";
 
 		// usual cases
-		Assert.assertEquals(expected, FeedUtils.toAbsoluteUrl("http://a.com/blog/entry/1", "http://a.com/feed/", "http://a.com/feed/"));
-		Assert.assertEquals(expected, FeedUtils.toAbsoluteUrl("http://a.com/blog/entry/1", "http://a.com/feed", "http://a.com/feed"));
+		Assert.assertEquals(expected, FeedUtils.toAbsoluteUrl("http://a.com/blog/feedEntry/1", "http://a.com/feed/", "http://a.com/feed/"));
+		Assert.assertEquals(expected, FeedUtils.toAbsoluteUrl("http://a.com/blog/feedEntry/1", "http://a.com/feed", "http://a.com/feed"));
 
 		// relative links
-		Assert.assertEquals(expected, FeedUtils.toAbsoluteUrl("../blog/entry/1", "http://a.com/feed/", "http://a.com/feed/"));
-		Assert.assertEquals(expected, FeedUtils.toAbsoluteUrl("../blog/entry/1", "feed.xml", "http://a.com/feed/feed.xml"));
+		Assert.assertEquals(expected, FeedUtils.toAbsoluteUrl("../blog/feedEntry/1", "http://a.com/feed/", "http://a.com/feed/"));
+		Assert.assertEquals(expected, FeedUtils.toAbsoluteUrl("../blog/feedEntry/1", "feed.xml", "http://a.com/feed/feed.xml"));
 
 		// root-relative links
-		Assert.assertEquals(expected, FeedUtils.toAbsoluteUrl("/blog/entry/1", "/feed", "http://a.com/feed"));
+		Assert.assertEquals(expected, FeedUtils.toAbsoluteUrl("/blog/feedEntry/1", "/feed", "http://a.com/feed"));
 
 		// real cases
 		Assert.assertEquals("https://github.com/erusev/parsedown/releases/tag/1.3.0", FeedUtils.toAbsoluteUrl(
