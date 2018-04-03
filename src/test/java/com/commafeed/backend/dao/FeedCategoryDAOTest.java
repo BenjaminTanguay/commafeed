@@ -1,5 +1,6 @@
 package com.commafeed.backend.dao;
 
+import com.commafeed.backend.dao.newstorage.GenericStorage;
 import com.commafeed.backend.model.Feed;
 import com.commafeed.backend.model.FeedCategory;
 import com.commafeed.backend.model.FeedEntry;
@@ -28,7 +29,7 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
 	private static FeedCategoryStorage feedCategoryStorage;
 	private static List<Class> classes = new ArrayList<>();
 	private static User testUser;
-	
+	private static GenericStorage<Long, FeedCategory> storage;
 	@BeforeClass
     public static void beforeClass() {
 		userDAO = new UserDAO(createSessionFactory(User.class));
@@ -47,6 +48,8 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
 		classes.add(FeedEntryTag.class);
 		feedCategoryStorage = new FeedCategoryStorage(createSessionFactory(classes), testUser);
 		
+		String serializationFilename = "TestStorage";
+		storage = new GenericStorage<Long, FeedCategory>(serializationFilename);
     }
 
     @Before
@@ -69,6 +72,7 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
     	//fork lift
     	feedCategoryStorage.forklift();
     	assertEquals(0, feedCategoryStorage.checkConsistency());
+    	feedCategoryStorage.print("After Fork Lift");
     	//delete category from database
     	//feedCategoryStorage.testDeletion();		
     	//assertEquals(8, feedCategoryStorage.checkConsistency());
@@ -77,6 +81,9 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
     	//FeedCategory newCategory = createFakeCategory();
 		//feedCategoryStorage.saveOrUpdate(newCategory);
     	feedCategoryStorage.updateOnlyDatabase();
+    	storage.loadStorage();
+    	feedCategoryStorage.loadStorage(storage);
+    	feedCategoryStorage.print("After Database Update");
 		assertEquals(0, feedCategoryStorage.checkConsistency());
 		//feedCategoryStorage.print("Copied List");
 		
