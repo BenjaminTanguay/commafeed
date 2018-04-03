@@ -24,9 +24,7 @@ import org.junit.Test;
 public class FeedCategoryDAOTest extends AbstractDAOTest{
 
 
-	private static UserDAO userDAO;							
-	private static FeedCategoryDAO feedCategoryDAO;	
-	private static List<FeedCategory> testFileList;
+	private static UserDAO userDAO;					
 	private static FeedCategoryStorage feedCategoryStorage;
 	private static List<Class> classes = new ArrayList<>();
 	private static User testUser;
@@ -70,14 +68,17 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
     public void forkliftTest() {
     	//fork lift
     	feedCategoryStorage.forklift();
-    	feedCategoryStorage.print("Copied List");
     	assertEquals(0, feedCategoryStorage.checkConsistency());
-    	
+    	//delete category from database
+    	//feedCategoryStorage.testDeletion();		
+    	//assertEquals(8, feedCategoryStorage.checkConsistency());
     	//shadow writes: any changes are written directly to old
 		//consistency should be checked after each write
-    	FeedCategory newCategory = createFakeCategory();
-		feedCategoryStorage.saveOrUpdate(newCategory);
+    	//FeedCategory newCategory = createFakeCategory();
+		//feedCategoryStorage.saveOrUpdate(newCategory);
+    	feedCategoryStorage.updateOnlyDatabase();
 		assertEquals(0, feedCategoryStorage.checkConsistency());
+		//feedCategoryStorage.print("Copied List");
 		
 		//Shadow Reads for Validation (read will access both old and new)
 		// change the hash only
@@ -123,14 +124,14 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
     	sports.add("Football");
     	sports.add("Hockey");
     	FeedCategory newCategory = new FeedCategory();					
-    	Set<FeedCategory> childCategories = new HashSet<FeedCategory>();
+    	//Set<FeedCategory> childCategories = new HashSet<FeedCategory>();
     	//create parent category
     	newCategory = createCategory(1100L, "Sports", null, 0, null );
-    	//create sub categories
+    	/*create sub categories
     	for(int i = 0; i < SIZE_OF_LIST; i++){
     		childCategories.add(createCategory(new Long(1100+i), sports.get(i), newCategory, 0, null ));
-    	}
-    	newCategory.setChildren(childCategories);
+    	}*/
+    	//newCategory.setChildren(childCategories);
     	return newCategory;
     }
     

@@ -1,15 +1,19 @@
 package com.commafeed.backend.dao;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.glassfish.hk2.utilities.reflection.Logger;
 import org.hibernate.SessionFactory;
 
 import com.commafeed.backend.model.Feed;
@@ -25,36 +29,59 @@ import com.querydsl.core.types.Predicate;
 
 public class FeedCategoryStorage extends FeedCategoryDAO{
 
-	private static  List<FeedCategory> testingList; 
+	private HashMap<Long, FeedCategory> testingList;
 	static FeedCategoryStorage feedCategoryStorage;
 	private User user;
 	private int readInconsistencies = 0;
 	
-	@Inject
 	public FeedCategoryStorage(SessionFactory sessionFactory, User user) {
 		
 		super(sessionFactory);
 		this.user = user;
-		testingList = new ArrayList<>();
+		testingList = new HashMap<Long, FeedCategory>();
 	}
 	
 	public int getReadInconsistencies() {
 		return readInconsistencies;
 	}
-
-	public void loadStorage(){
-		forklift();
-	}
 	
     public void forklift(){
-    	testingList = super.findAll(user);
+    	List<FeedCategory> originList = super.findAll(user);
+    	int key = 0;
+    	for(FeedCategory i : originList){
+    		testingList.put(i.getId(), i);
+    		key++;
+    	}
+		print("testing List", testingList);
+    	
+    }
+    
+    public void updateOnlyDatabase(){
+    	List<FeedCategory> updatedCategory = new ArrayList<FeedCategory>(super.findAll(user));
+    	updatedCategory.get(0).setName("Testing News");
+    	super.saveOrUpdate(updatedCategory);
+    	print("TestingList ", testingList);
+    	//print("copy list", copyList);
+    }
+    
+    public void testDeletion(){
+    	//final Logger logger = Logger.getLogger();
+    	Iterator<FeedCategory> children = testingList.get(0).getChildren().iterator();
+    	while(children.hasNext()){
+    		FeedCategory current = children.next();
+    		if(current.getName().equals("CNN")){
+    			//current.setName("testing");
+    			//testingList.remove(current);
+    			System.out.println("Deleting " + current.getName());
+    			super.delete(current);
+    		}
+    	}
     }
 	
 	@Override
 	public void saveOrUpdate(FeedCategory newCategory) {
 			//shadow write
-			testingList.add(newCategory);
-		
+			testingList.put(newCategory.getId(), newCategory);
 			//actual write to old data store
 			super.saveOrUpdate(newCategory);
 	}
@@ -68,21 +95,16 @@ public class FeedCategoryStorage extends FeedCategoryDAO{
 	public FeedCategory findById(User user, Long id) {
 		FeedCategory expectedCategory = super.findById(user,id);
 		
-		//shadow read
-		boolean exist = false;
-		for(FeedCategory item : testingList){
-			if(item.getId() == id && item.getUser() == user){
-				exist = true;
-				if(expectedCategory != item)	//fix any inconsistency	
-					item = expectedCategory;
-			}
-		}
-		if(!exist){
-			System.out.println("Item Doesnt Exist");
-		}
+		//shadow read & validate
+		if(expectedCategory != testingList.get(id))
+			fixInconsistency(expectedCategory);
 		return expectedCategory;
 	}
 
+	public void fixInconsistency(FeedCategory origin){
+		testingList.get(origin.getId()).setName(origin.getName());
+	}
+	
 	@Override
 	public FeedCategory findByName(User user, String name, FeedCategory parent) { 
 		FeedCategory expectedCategory = super.findByName(user, name, parent);
@@ -149,24 +171,24 @@ public class FeedCategoryStorage extends FeedCategoryDAO{
 		int inconsistencies = 0;
 		List<FeedCategory> expectedList = super.findAll(user);
 		Iterator<FeedCategory> expectedCategories = expectedList.iterator();
-		Iterator<FeedCategory> actualCategories = testingList.iterator();
-		while (expectedCategories.hasNext() && actualCategories.hasNext())
+		while (expectedCategories.hasNext())
 		{
 		    FeedCategory expected = expectedCategories.next();
-		    FeedCategory actual = actualCategories.next();
-		    if (!expected.equals(actual)) {
+		    if (!expected.equals(testingList.get(expected.getId()))) {
+				inconsistencies++;
+				System.out.println("expected: " + expected.getName());
+				System.out.println("actual: " + testingList.get(expected.getId()));
 				//fix the inconsistency
-				actual = expected;
-				inconsistencies++;	
+				//actual = expected;
 			}
 		}
 		return inconsistencies;
 	}
-	public void print(String title){
+	public void print(String title, HashMap<Long,FeedCategory> list){
 		System.out.println(title);
     	System.out.println("------------------------------------------");
-		for(FeedCategory category: testingList){
-			System.out.println(category.getName());
+		for(Long i : list.keySet()){
+			System.out.println(list.get(i).getName());
 		}
     	System.out.println("------------------------------------------");
 	}

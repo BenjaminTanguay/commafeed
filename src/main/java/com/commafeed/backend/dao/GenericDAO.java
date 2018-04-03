@@ -2,6 +2,8 @@ package com.commafeed.backend.dao;
 
 import java.util.Collection;
 
+import javax.annotation.Resource;
+
 import org.hibernate.SessionFactory;
 
 import com.commafeed.backend.model.AbstractModel;
