@@ -40,4 +40,31 @@ public class FeedCategory extends AbstractModel {
 
 	private Integer position;
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public void setParent(FeedCategory parent) {
+		this.parent = parent;
+	}
+
+	public void setChildren(Set<FeedCategory> children) {
+		this.children = children;
+	}
+
+	public void setSubscriptions(Set<FeedSubscription> subscriptions) {
+		this.subscriptions = subscriptions;
+	}
+
+	public void setCollapsed(boolean collapsed) {
+		this.collapsed = collapsed;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
+	}
 }

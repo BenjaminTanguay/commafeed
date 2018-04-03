@@ -1,5 +1,6 @@
-package com.commafeed.backend.dao;
+package com.commafeed.backend.dao.newstorage;
 
+import com.commafeed.backend.dao.FeedEntryStatusDAO;
 import com.commafeed.backend.model.FeedCategory;
 import com.commafeed.backend.model.FeedEntryStatus;
 import com.commafeed.backend.model.User;
@@ -10,7 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class FeedEntryStatusStorage extends FeedEntryStatusDAO{
+public class FeedEntryStatusStorage extends FeedEntryStatusDAO {
 
     private HashMap<Long, FeedEntryStatus> testingList;
     static FeedEntryStatusStorage feedEntryStatusStorage;

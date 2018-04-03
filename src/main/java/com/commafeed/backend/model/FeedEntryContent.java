@@ -52,4 +52,40 @@ public class FeedEntryContent extends AbstractModel {
 	public String getTitle() {
 		return title;
 	}
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+	public void setTitleHash(String titleHash) {
+		this.titleHash = titleHash;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public void setContentHash(String contentHash) {
+		this.contentHash = contentHash;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+	public void setEnclosureUrl(String enclosureUrl) {
+		this.enclosureUrl = enclosureUrl;
+	}
+
+	public void setEnclosureType(String enclosureType) {
+		this.enclosureType = enclosureType;
+	}
+
+	public void setCategories(String categories) {
+		this.categories = categories;
+	}
+
+	public void setEntries(Set<FeedEntry> entries) {
+		this.entries = entries;
+	}
 }

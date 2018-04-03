@@ -50,4 +50,32 @@ public class FeedSubscription extends AbstractModel {
 	public Long getId() {
 		return id;
 	}
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+	public void setFeed(Feed feed) {
+		this.feed = feed;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setCategory(FeedCategory category) {
+		this.category = category;
+	}
+
+	public void setStatuses(Set<FeedEntryStatus> statuses) {
+		this.statuses = statuses;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
+	}
+
+	public void setFilter(String filter) {
+		this.filter = filter;
+	}
 }

@@ -178,4 +178,80 @@ public class Feed extends AbstractModel {
 
 		return Objects.hash(url, urlAfterRedirect, normalizedUrl, normalizedUrlHash, link, lastUpdated, lastPublishedDate, lastEntryDate, message, errorCount, disabledUntil, lastModifiedHeader, etagHeader, averageEntryInterval, lastContentHash, pushHub, pushTopic, pushTopicHash, pushLastPing);
 	}
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+	public void setUrlAfterRedirect(String urlAfterRedirect) {
+		this.urlAfterRedirect = urlAfterRedirect;
+	}
+
+	public void setNormalizedUrl(String normalizedUrl) {
+		this.normalizedUrl = normalizedUrl;
+	}
+
+	public void setNormalizedUrlHash(String normalizedUrlHash) {
+		this.normalizedUrlHash = normalizedUrlHash;
+	}
+
+	public void setLink(String link) {
+		this.link = link;
+	}
+
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
+
+	public void setLastPublishedDate(Date lastPublishedDate) {
+		this.lastPublishedDate = lastPublishedDate;
+	}
+
+	public void setLastEntryDate(Date lastEntryDate) {
+		this.lastEntryDate = lastEntryDate;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public void setErrorCount(int errorCount) {
+		this.errorCount = errorCount;
+	}
+
+	public void setDisabledUntil(Date disabledUntil) {
+		this.disabledUntil = disabledUntil;
+	}
+
+	public void setLastModifiedHeader(String lastModifiedHeader) {
+		this.lastModifiedHeader = lastModifiedHeader;
+	}
+
+	public void setEtagHeader(String etagHeader) {
+		this.etagHeader = etagHeader;
+	}
+
+	public void setAverageEntryInterval(long averageEntryInterval) {
+		this.averageEntryInterval = averageEntryInterval;
+	}
+
+	public void setLastContentHash(String lastContentHash) {
+		this.lastContentHash = lastContentHash;
+	}
+
+	public void setPushHub(String pushHub) {
+		this.pushHub = pushHub;
+	}
+
+	public void setPushTopic(String pushTopic) {
+		this.pushTopic = pushTopic;
+	}
+
+	public void setPushTopicHash(String pushTopicHash) {
+		this.pushTopicHash = pushTopicHash;
+	}
+
+	public void setPushLastPing(Date pushLastPing) {
+		this.pushLastPing = pushLastPing;
+	}
 }

@@ -3,17 +3,7 @@ package com.commafeed.backend.model;
 import java.util.Date;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.persistence.criteria.Expression;
 
 import lombok.Getter;
@@ -81,5 +71,33 @@ public class FeedEntry extends AbstractModel {
 
 	public Expression<?> count() {
 		return null;
+	}
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
+
+	public void setGuidHash(String guidHash) {
+		this.guidHash = guidHash;
+	}
+
+	public void setFeed(Feed feed) {
+		this.feed = feed;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public void setInserted(Date inserted) {
+		this.inserted = inserted;
+	}
+
+	public void setStatuses(Set<FeedEntryStatus> statuses) {
+		this.statuses = statuses;
+	}
+
+	public void setTags(Set<FeedEntryTag> tags) {
+		this.tags = tags;
 	}
 }
