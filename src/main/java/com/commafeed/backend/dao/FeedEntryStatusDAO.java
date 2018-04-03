@@ -1,9 +1,7 @@
 package com.commafeed.backend.dao;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -48,6 +46,7 @@ public class FeedEntryStatusDAO extends GenericDAO<FeedEntryStatus> {
 	private FeedEntry entry = new FeedEntry();
 	private FeedEntryContent content = new FeedEntryContent();
 	private FeedEntryTag entryTag = new FeedEntryTag();
+	private ConcurrentHashMap<Object, Object> longTermHashMap;
 
 	@Inject
 	public FeedEntryStatusDAO(SessionFactory sessionFactory) {
@@ -327,6 +326,28 @@ public class FeedEntryStatusDAO extends GenericDAO<FeedEntryStatus> {
 
 	private List<User> findAll() {
 		return query().selectFrom(user).fetch();
+	}
+
+	public int consistencyChecker() {
+		int inconsistencyCounter = 0;
+		if (MigrationToggles.isLongTermConsistencyOn()) {
+			Collection<Object> feedEntryStatuses = this.longTermHashMap.values();
+			for(Object entry: feedEntryStatuses) {
+				if (!this.storage.isModelConsistent((FeedEntryStatus) entry)) {
+					++inconsistencyCounter;
+				}
+			}
+		} else {
+			if (MigrationToggles.isConsistencyCheckerOn()) {
+				List<User> feedEntryStatuses = findAll();
+				for(User entry: feedEntryStatuses) {
+					if (!this.storage.isModelConsistent((FeedEntryStatus) feedEntryStatuses)) {
+						++inconsistencyCounter;
+					}
+				}
+			}
+		}
+		return inconsistencyCounter;
 	}
 
 }
