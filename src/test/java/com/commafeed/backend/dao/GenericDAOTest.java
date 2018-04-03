@@ -30,7 +30,7 @@ public class GenericDAOTest extends AbstractDAOTest {
         List<Class> classList = new ArrayList<>();
         classList.add(UserSettings.class);
         classList.add(User.class);
-        userSettingsDAO = new UserSettingsDAO(createSessionFactory(classList));
+        userSettingsDAO = new UserSettingsDAO(createSessionFactory(classList, this.entryDAO, this.entryTagDAO, this.config));
         MigrationToggles.turnAllTogglesOff();
         // Creating all the users in the database
         user1 = getUser("Hello", "Hello@gmail.com");
@@ -137,9 +137,9 @@ public class GenericDAOTest extends AbstractDAOTest {
         MigrationToggles.turnAllTogglesOff();
     }
 
-    private static UserSettings getUserSettings(User user,
-                                                String language, boolean
-            facebook) {
+    static UserSettings getUserSettings(User user,
+                                        String language, boolean
+                                                facebook) {
         UserSettings userSettings = new UserSettings();
         userSettings.setUser(user);
         userSettings.setBuffer(false);
@@ -164,7 +164,7 @@ public class GenericDAOTest extends AbstractDAOTest {
         return userSettings;
     }
 
-    private static User getUser(String name, String email) {
+    static User getUser(String name, String email) {
         User user = new User();
         Date date = new Date(000000000);
         user.setApiKey("ApiKey");

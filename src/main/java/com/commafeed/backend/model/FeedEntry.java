@@ -14,6 +14,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.criteria.Expression;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -32,25 +33,53 @@ public class FeedEntry extends AbstractModel {
 	private String guidHash;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	private Feed feed;
+	public Feed feed;
 
 	@OneToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(nullable = false, updatable = false)
-	private FeedEntryContent content;
+	public FeedEntryContent content;
 
 	@Column(length = 2048)
 	private String url;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date inserted;
+	public Date inserted;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date updated;
+	public Date updated;
 
 	@OneToMany(mappedBy = "entry", cascade = CascadeType.REMOVE)
-	private Set<FeedEntryStatus> statuses;
+	public Set<FeedEntryStatus> statuses;
 
 	@OneToMany(mappedBy = "entry", cascade = CascadeType.REMOVE)
-	private Set<FeedEntryTag> tags;
+	public Set<FeedEntryTag> tags;
+    public Query feed;
 
+    public FeedEntryContent getContent() {
+        return content;
+    }
+
+	public Date getUpdated() {
+		return updated;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setUpdated(Date updated) {
+		this.updated = updated;
+	}
+
+	public void setContent(FeedEntryContent content) {
+		this.content = content;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public Expression<?> count() {
+		return null;
+	}
 }

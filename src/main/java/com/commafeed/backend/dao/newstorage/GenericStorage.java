@@ -4,10 +4,15 @@ public class GenericStorage<Key, Value> {
 
     private HashStorage hashMap;
     private SerializeHashMap serialize;
+    private static GenericStorage testInstance;
 
     protected GenericStorage(String filename) {
         this.hashMap = new HashStorage<Key, Value>();
         this.serialize = new SerializeHashMap(hashMap, filename);
+    }
+
+    public static GenericStorage getTestInstance() {
+        return testInstance;
     }
 
     protected void loadStorage() {

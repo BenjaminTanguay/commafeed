@@ -15,6 +15,14 @@ import org.apache.commons.lang3.StringUtils;
 @RequiredArgsConstructor
 public class FeedEntryKeyword {
 
+    public String getKeyword() {
+        return keyword;
+    }
+
+	public Mode getMode() {
+		return mode;
+	}
+
 	public static enum Mode {
 		INCLUDE, EXCLUDE;
 	}

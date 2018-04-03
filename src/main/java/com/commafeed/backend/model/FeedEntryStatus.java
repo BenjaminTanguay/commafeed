@@ -4,15 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -26,15 +18,15 @@ public class FeedEntryStatus extends AbstractModel {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(nullable = false)
-	private FeedSubscription subscription;
+	public FeedSubscription subscription;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(nullable = false)
-	private FeedEntry entry;
+	public FeedEntry entry;
 
 	@Column(name = "read_status")
-	private boolean read;
-	private boolean starred;
+	public boolean read;
+	public boolean starred;
 
 	@Transient
 	private boolean markable;
@@ -51,10 +43,11 @@ public class FeedEntryStatus extends AbstractModel {
 	private User user;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date entryInserted;
+	public Date entryInserted;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date entryUpdated;
+	public Date entryUpdated;
+	public Query subscription;
 
 	public FeedEntryStatus() {
 
@@ -68,4 +61,47 @@ public class FeedEntryStatus extends AbstractModel {
 		setEntryUpdated(entry.getUpdated());
 	}
 
+	public Date getEntryUpdated() {
+		return entryUpdated;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public FeedEntry getEntry() {
+		return entry;
+	}
+
+	public void setRead(boolean read) {
+		this.read = read;
+	}
+
+	public void setMarkable(boolean markable) {
+		this.markable = markable;
+	}
+
+    public void setTags(List<FeedEntryTag> tags) {
+        this.tags = tags;
+    }
+
+	public FeedSubscription getSubscription() {
+		return subscription;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setEntryUpdated(Date entryUpdated) {
+		this.entryUpdated = entryUpdated;
+	}
+
+	public void setSubscription(FeedSubscription subscription) {
+		this.subscription = subscription;
+	}
+
+	public void setEntry(FeedEntry entry) {
+		this.entry = entry;
+	}
 }

@@ -21,7 +21,7 @@ import org.hibernate.annotations.Type;
 public class FeedEntryContent extends AbstractModel {
 
 	@Column(length = 2048)
-	private String title;
+	public String title;
 
 	@Column(length = 40)
 	private String titleHash;
@@ -29,7 +29,7 @@ public class FeedEntryContent extends AbstractModel {
 	@Lob
 	@Column(length = Integer.MAX_VALUE)
 	@Type(type = "org.hibernate.type.StringClobType")
-	private String content;
+	public String content;
 
 	@Column(length = 40)
 	private String contentHash;
@@ -49,4 +49,7 @@ public class FeedEntryContent extends AbstractModel {
 	@OneToMany(mappedBy = "content")
 	private Set<FeedEntry> entries;
 
+	public String getTitle() {
+		return title;
+	}
 }

@@ -1,5 +1,6 @@
 package com.commafeed.backend.dao;
 
+import com.commafeed.CommaFeedConfiguration;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -33,7 +34,7 @@ public class AbstractDAOTest {
         return sessionFactory;
     }
 
-    public static SessionFactory createSessionFactory(List<Class> classParams) {
+    public static SessionFactory createSessionFactory(List<Class> classParams, FeedEntryDAO entryDAO, FeedEntryTagDAO entryTagDAO, CommaFeedConfiguration config) {
         configureDatabaseSettings();
         addModelsToConfiguration(classParams);
         buildSessionFactory();

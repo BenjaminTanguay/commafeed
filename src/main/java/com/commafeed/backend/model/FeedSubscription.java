@@ -43,4 +43,11 @@ public class FeedSubscription extends AbstractModel {
 	@Column(length = 4096)
 	private String filter;
 
+    public Feed getFeed() {
+        return feed;
+    }
+
+	public Long getId() {
+		return id;
+	}
 }

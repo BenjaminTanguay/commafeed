@@ -143,3 +143,7 @@ public class User extends AbstractModel {
 				user.getLastFullRefresh() == null;
 	}
 }
+
+	public Long getId() {
+		return id;
+	}

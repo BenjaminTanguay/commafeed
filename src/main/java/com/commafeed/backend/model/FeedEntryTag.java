@@ -19,14 +19,14 @@ public class FeedEntryTag extends AbstractModel {
 
 	@JoinColumn(name = "user_id")
 	@ManyToOne(fetch = FetchType.LAZY)
-	private User user;
+    public User user;
 
 	@JoinColumn(name = "entry_id")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private FeedEntry entry;
 
 	@Column(name = "name", length = 40)
-	private String name;
+	public String name;
 
 	public FeedEntryTag() {
 	}

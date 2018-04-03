@@ -42,14 +42,13 @@ public class FeedEntryStatusDAO extends GenericDAO<FeedEntryStatus> {
 	private FeedEntryTagDAO feedEntryTagDAO;
 	private CommaFeedConfiguration config;
 
-	private QFeedEntryStatus status = QFeedEntryStatus.feedEntryStatus;
-	private QFeedEntry entry = QFeedEntry.feedEntry;
-	private QFeedEntryContent content = QFeedEntryContent.feedEntryContent;
-	private QFeedEntryTag entryTag = QFeedEntryTag.feedEntryTag;
+	private FeedEntryStatus status = new FeedEntryStatus();
+	private FeedEntry entry = new FeedEntry();
+	private FeedEntryContent content = new FeedEntryContent();
+	private FeedEntryTag entryTag = new FeedEntryTag();
 
 	@Inject
-	public FeedEntryStatusDAO(SessionFactory sessionFactory, FeedEntryDAO feedEntryDAO, FeedEntryTagDAO feedEntryTagDAO,
-			CommaFeedConfiguration config) {
+	public FeedEntryStatusDAO(SessionFactory sessionFactory) {
 		super(sessionFactory);
 		this.feedEntryDAO = feedEntryDAO;
 		this.feedEntryTagDAO = feedEntryTagDAO;
@@ -295,7 +294,7 @@ public class FeedEntryStatusDAO extends GenericDAO<FeedEntryStatus> {
 		List<Tuple> tuples = query.select(entry.count(), entry.updated.max()).fetch();
 		for (Tuple tuple : tuples) {
 			Long count = tuple.get(entry.count());
-			Date updated = tuple.get(entry.updated.max());
+			Date updated = tuple.get(count.max());
 			uc = new UnreadCount(subscription.getId(), count, updated);
 		}
 		return uc;

@@ -22,7 +22,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Getter
 public class CommaFeedConfiguration extends Configuration {
 
-	public static enum CacheType {
+	public ApplicationSettings getApplicationSettings() {
+		return applicationSettings;
+	}
+
+    public static enum CacheType {
 		NOOP, REDIS
 	}
 
@@ -147,6 +151,9 @@ public class CommaFeedConfiguration extends Configuration {
 			return keepStatusDays > 0 ? DateUtils.addDays(new Date(), -1 * keepStatusDays) : null;
 		}
 
-	}
+		public Integer getQueryTimeout() {
+			return queryTimeout;
+		}
+    }
 
 }

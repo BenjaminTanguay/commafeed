@@ -29,5 +29,5 @@ public abstract class AbstractModel implements Serializable {
 			pkColumnName = "sequence_name",
 			valueColumnName = "sequence_next_hi_value",
 			allocationSize = 1000)
-	private Long id;
+    public Long id;
 }
