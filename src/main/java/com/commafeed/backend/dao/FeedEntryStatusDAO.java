@@ -8,6 +8,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.commafeed.backend.dao.datamigrationtoggles.MigrationToggles;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.hibernate.SessionFactory;
@@ -41,6 +42,7 @@ public class FeedEntryStatusDAO extends GenericDAO<FeedEntryStatus> {
 	private FeedEntryDAO feedEntryDAO;
 	private FeedEntryTagDAO feedEntryTagDAO;
 	private CommaFeedConfiguration config;
+	private User user = new User();
 
 	private FeedEntryStatus status = new FeedEntryStatus();
 	private FeedEntry entry = new FeedEntry();
@@ -312,6 +314,19 @@ public class FeedEntryStatusDAO extends GenericDAO<FeedEntryStatus> {
 
 	public List<FeedEntryStatus> getOldStatuses(Date olderThan, int limit) {
 		return query().selectFrom(status).where(status.entryInserted.lt(olderThan), status.starred.isFalse()).limit(limit).fetch();
+	}
+
+	public void forklift() {
+		if (MigrationToggles.isForkLiftOn()) {
+			List<User> users = findAll();
+			for(User user: users) {
+				saveOrUpdateToStorage(user);
+			}
+		}
+	}
+
+	private List<User> findAll() {
+		return query().selectFrom(user).fetch();
 	}
 
 }

@@ -150,7 +150,7 @@ public class FeedEntryStatusDAOTest extends AbstractDAOTest {
     public void testForklift() {
         MigrationToggles.turnForkLiftOn();
         // Forklifting the data from the database to the storage
-        userDAO.forklift();
+        feedEntryStatusDAO.forklift();
         // Checking that the data in the storage is ok
         assert(this.storage.exists(user1));
         assert(this.storage.exists(user2));
