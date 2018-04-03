@@ -1,32 +1,14 @@
 package com.commafeed.backend.dao;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-
-import org.glassfish.hk2.utilities.reflection.Logger;
 import org.hibernate.SessionFactory;
 
 import com.commafeed.backend.dao.newstorage.GenericStorage;
-import com.commafeed.backend.model.Feed;
 import com.commafeed.backend.model.FeedCategory;
-import com.commafeed.backend.model.FeedEntry;
-import com.commafeed.backend.model.FeedEntryContent;
-import com.commafeed.backend.model.FeedEntryStatus;
-import com.commafeed.backend.model.FeedEntryTag;
-import com.commafeed.backend.model.FeedSubscription;
-import com.commafeed.backend.model.QUser;
 import com.commafeed.backend.model.User;
-import com.querydsl.core.types.Predicate;
 
 public class FeedCategoryStorage extends FeedCategoryDAO{
 

@@ -13,9 +13,7 @@ import com.commafeed.backend.model.User;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
@@ -48,7 +46,7 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
 		classes.add(FeedEntryTag.class);
 		feedCategoryStorage = new FeedCategoryStorage(createSessionFactory(classes), testUser);
 		
-		String serializationFilename = "TestStorage";
+		String serializationFilename = "FeedCategoryStorage";
 		storage = new GenericStorage<Long, FeedCategory>(serializationFilename);
     }
 
