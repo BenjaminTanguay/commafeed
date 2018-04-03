@@ -64,6 +64,26 @@ public class FeedEntryDAOTest extends AbstractDAOTest {
     }
 
     @Test
+    public void testForklift() {
+        MigrationToggles.turnForkLiftOn();
+
+        feedEntry1 = getFeedEntry("3333", "url34");
+        feedEntryDAO.saveOrUpdate(feedEntry1);
+        feedEntry2 = getFeedEntry("223322", "url342");
+        feedEntryDAO.saveOrUpdate(feedEntry2);
+
+        feedEntryDAO.forklift();
+
+        feedEntryDAO.delete(feedEntry1);
+        feedEntryDAO.delete(feedEntry2);
+
+        assert(this.storage.exists(feedEntry1));
+        assert(this.storage.exists(feedEntry2));
+        assert(this.storage.read(feedEntry1).equals(feedEntry1));
+        assert(this.storage.read(feedEntry1).equals(feedEntry2));
+    }
+
+    @Test
     public void testShadowWrite() {
         MigrationToggles.turnShadowWritesOn();
 
