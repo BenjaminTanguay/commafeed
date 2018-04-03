@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.hibernate.cfg.AvailableSettings;
 
+import com.commafeed.backend.dao.UserDAO;
+//import com.commafeed.backend.dao.UserStorage;
 import com.commafeed.backend.feed.FeedRefreshTaskGiver;
 import com.commafeed.backend.feed.FeedRefreshUpdater;
 import com.commafeed.backend.feed.FeedRefreshWorker;
@@ -66,7 +68,7 @@ public class CommaFeedApplication extends Application<CommaFeedConfiguration> {
 
 	public static final String USERNAME_ADMIN = "admin";
 	public static final String USERNAME_DEMO = "demo";
-
+	public UserDAO userDAO;
 	public static final Date STARTUP_TIME = new Date();
 
 	private HibernateBundle<CommaFeedConfiguration> hibernateBundle;
@@ -170,5 +172,6 @@ public class CommaFeedApplication extends Application<CommaFeedConfiguration> {
 
 	public static void main(String[] args) throws Exception {
 		new CommaFeedApplication().run(args);
+		
 	}
 }
