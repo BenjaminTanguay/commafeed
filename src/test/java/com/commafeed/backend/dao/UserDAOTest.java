@@ -33,6 +33,9 @@ public class UserDAOTest extends AbstractDAOTest {
 
     @Test
     public void test() {
-        // DO SOMETHING
+    	
+    	System.out.println("test");
+       //System.out.println(userTest.getEmail());
+      //System.out.println(userTest.getId()); 
     }
 }
