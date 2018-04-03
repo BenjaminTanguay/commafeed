@@ -140,9 +140,21 @@ public class FeedEntryStatusDAOTest extends AbstractDAOTest {
     public void testOldStatus(){
         Date testDate = new Date();
         List<FeedEntryStatus> tempStatus = new ArrayList<>();
-        
+
         when(feedEntryStatusDAO.getOldStatuses(testDate, 10)).thenReturn(tempStatus);
 
         Assert.assertEquals(tempStatus, feedEntryStatusDAO.getOldStatuses(testDate, 10));
+    }
+
+    @Test
+    public void testForklift() {
+        MigrationToggles.turnForkLiftOn();
+        // Forklifting the data from the database to the storage
+        userDAO.forklift();
+        // Checking that the data in the storage is ok
+        assert(this.storage.exists(user1));
+        assert(this.storage.exists(user2));
+        assert(this.storage.read(user1).equals(user1));
+        assert(this.storage.read(user2).equals(user2));
     }
 }

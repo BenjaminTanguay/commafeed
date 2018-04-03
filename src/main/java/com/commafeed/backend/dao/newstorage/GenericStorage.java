@@ -23,7 +23,7 @@ public class GenericStorage<Key, Value> {
         this.serialize.persistMap();
     }
 
-    protected boolean exists(Key key) {
+    public boolean exists(Key key) {
         return this.hashMap.exists(key);
     }
 
@@ -31,7 +31,7 @@ public class GenericStorage<Key, Value> {
         this.hashMap.create(key, value);
     }
 
-    protected Value read(Key key) {
+    public Value read(Key key) {
         return (Value) this.hashMap.read(key);
     }
 
