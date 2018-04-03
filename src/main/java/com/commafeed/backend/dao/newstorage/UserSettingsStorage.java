@@ -52,7 +52,7 @@ public class UserSettingsStorage implements
 
     @Override
     public UserSettings delete(UserSettings model) {
-        return this.storage.delete(model.getUser().getId());
+        return this.storage.delete(model.getUser().getId(), model);
     }
 
     @Override

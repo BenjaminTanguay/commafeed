@@ -164,7 +164,7 @@ public class GenericDAOTest extends AbstractDAOTest {
         return userSettings;
     }
 
-    private static User getUser(String name, String email) {
+    public static User getUser(String name, String email) {
         User user = new User();
         Date date = new Date(000000000);
         user.setApiKey("ApiKey");
