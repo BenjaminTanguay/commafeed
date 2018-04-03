@@ -33,7 +33,6 @@ public class FeedCategoryStorage extends FeedCategoryDAO{
 	private HashMap<Long, FeedCategory> testingList;
 	static FeedCategoryStorage feedCategoryStorage;
 	private User user;
-	private int inconsistencies = 0;
 	private GenericStorage<Long, FeedCategory> storage;
 	
 	public FeedCategoryStorage(SessionFactory sessionFactory, User user) {
@@ -43,13 +42,14 @@ public class FeedCategoryStorage extends FeedCategoryDAO{
 		String serializationFilename = "TestStorage";
 		storage = new GenericStorage<Long, FeedCategory>(serializationFilename);
 	}
-	
-	public int getReadInconsistencies() {
-		return inconsistencies;
-	}
-	
+
 	public void loadStorage(GenericStorage<Long, FeedCategory> storage){
 		this.storage = storage;
+	}
+	
+	
+	public GenericStorage<Long, FeedCategory> getStorage(){
+		return storage;
 	}
 	
     public void forklift(){
@@ -80,20 +80,50 @@ public class FeedCategoryStorage extends FeedCategoryDAO{
 	
 	@Override
 	public void saveOrUpdate(FeedCategory newCategory) {
-			//shadow write
-			storage.create(newCategory.getId(), newCategory);
-			storage.saveStorage();
-			//actual write to old data store
-			super.saveOrUpdate(newCategory);
+			List<FeedCategory> originList = new ArrayList<FeedCategory>(super.findAll(user));
+	    	Iterator<FeedCategory> iterator = originList.iterator();
+	    	while(iterator.hasNext()){
+	    		FeedCategory current = iterator.next();
+	    		if(current.getId().equals(newCategory.getId())){
+	    			current.setName(newCategory.getName());
+	    			current.setParent(newCategory.getParent());
+	    			current.setPosition(newCategory.getPosition());
+	    			current.setChildren(newCategory.getChildren());
+	    			
+	    			//shadow write
+	    			storage.create(current.getId(), current);
+	    			storage.saveStorage();
+	    			
+	    			//actual write to old data store
+	    			super.saveOrUpdate(originList);
+	    		}
+	    	}
 	}
 
-	private void checkAndFixInconsistency(FeedCategory expectedCategory){
-		if(!storage.exists(expectedCategory.getId()) || 
-				!expectedCategory.equals(storage.read(expectedCategory.getId()))){
-				//fix any inconsistency
-				storage.create(expectedCategory.getId(), expectedCategory);
-				storage.saveStorage();
-		}
+	private int checkAndFixInconsistency(FeedCategory expectedCategory){
+		int inconsistencies = 0;
+		if(!storage.exists(expectedCategory.getId())){
+			//object doesn't exist; create category
+			storage.create(expectedCategory.getId(), expectedCategory);
+		}else{
+			//fix any internal inconsistency
+			if(!expectedCategory.getName().equals(storage.read(expectedCategory.getId()).getName())){
+				storage.read(expectedCategory.getId()).setName(expectedCategory.getName());
+				inconsistencies ++;
+			}
+			if(expectedCategory.getParent()!= null){
+				if(!expectedCategory.getParent().getId().equals(storage.read(expectedCategory.getId()).getParent().getId())){
+					storage.read(expectedCategory.getId()).setName(expectedCategory.getName());
+					inconsistencies ++;
+				}
+			}
+			if(!expectedCategory.getPosition().equals(storage.read(expectedCategory.getId()).getPosition())){
+				storage.read(expectedCategory.getId()).setPosition(expectedCategory.getPosition());
+				inconsistencies ++;
+			}
+			storage.saveStorage();
+		} 	
+		return inconsistencies;
 	}
 	
 	@Override
@@ -142,20 +172,13 @@ public class FeedCategoryStorage extends FeedCategoryDAO{
 
 	//new should be the same as the old
 	public int checkConsistency() {
+		int inconsistencies = 0;
 		List<FeedCategory> expectedList = super.findAll(user);
 		Iterator<FeedCategory> expectedCategories = expectedList.iterator();
 		while (expectedCategories.hasNext())
 		{
 		    FeedCategory expected = expectedCategories.next();
-		    if(!storage.exists(expected.getId()) || 
-					!expected.equals(storage.read(expected.getId()))){
-					//fix any inconsistency
-		    	System.out.println("expected: " + expected);
-		    	System.out.println("actual: " + storage.read(expected.getId()));
-					//storage.create(expected.getId(), expected);
-					//storage.saveStorage();
-					inconsistencies++;
-			}
+		    inconsistencies += checkAndFixInconsistency(expected);
 		}
 		return inconsistencies;
 	}

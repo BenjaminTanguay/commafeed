@@ -68,100 +68,37 @@ public class FeedCategoryDAOTest extends AbstractDAOTest{
     }
 
     @Test
-    public void forkliftTest() {
+    public void ConsistencyCheckingTest() {
+    	FeedCategory newCategory = new FeedCategory();
+    	
     	//fork lift
     	feedCategoryStorage.forklift();
     	assertEquals(0, feedCategoryStorage.checkConsistency());
-    	feedCategoryStorage.print("After Fork Lift");
-    	//delete category from database
-    	//feedCategoryStorage.testDeletion();		
-    	//assertEquals(8, feedCategoryStorage.checkConsistency());
-    	//shadow writes: any changes are written directly to old
-		//consistency should be checked after each write
-    	//FeedCategory newCategory = createFakeCategory();
-		//feedCategoryStorage.saveOrUpdate(newCategory);
+    	
+    	//validate consistency checking
     	feedCategoryStorage.updateOnlyDatabase();
     	storage.loadStorage();
     	feedCategoryStorage.loadStorage(storage);
-    	feedCategoryStorage.print("After Database Update");
-		assertEquals(0, feedCategoryStorage.checkConsistency());
-		//feedCategoryStorage.print("Copied List");
+		assertEquals(1, feedCategoryStorage.checkConsistency());
+    	
+    	//shadow writes: any changes are written directly to old
+		//consistency should be checked after each write
+		newCategory = storage.read(1000L);
+		newCategory.setName("American News");
+		feedCategoryStorage.saveOrUpdate(newCategory);
+		newCategory = feedCategoryStorage.findById(testUser, 1000L);
+		assertEquals("American News", newCategory.getName());
+		storage.loadStorage();;
+		assertEquals("American News", storage.read(1000L).getName());
 		
 		//Shadow Reads for Validation (read will access both old and new)
 		// change the hash only
-		//arrayStorage.testOnlyPutHashOnly("123", "Milk 4.99");
-		//The end user still gets the correct result
-		//assertEquals("Milk 4.99", arrayStorage.barcode("123"));
-		//we ensure that that inconsistency is fixed
-		//assertEquals(0, arrayStorage.checkConsistency());
-    	//assertEquals(testingList,feedCategoryDAO.findAll(testUser));
-    }
-    
-    //@Test
-    public void shadowWriteTest(){
-    	//forklift();
-    	//shadow write
-    	/*shadowWrite();
-    	String oldName = testingList.get(0).getName();
-    	String newName = "Canadian News";
-    	testingList.get(0).setName(newName);
-    	feedCategoryDAO.saveOrUpdate(testingList);
-    	printList(testingList,"List");*/
-    	//assertEquals(oldName,newName);
-    	
-    	//shadow read
-    	
-    	//check inconsistency
-    	
-    	
-    }
-
-    private void shadowWrite(){
-    	
-    	//feedCategoryDAO.saveOrUpdate(newCategory);
-    }
-    
-    private FeedCategory createFakeCategory(){
-    	int SIZE_OF_LIST = 5;
-    	//create fake list of category names
-    	List<String> sports = new ArrayList<String>();
-    	sports.add("Basketball");
-    	sports.add("Soccer");
-    	sports.add("Baseball");
-    	sports.add("Football");
-    	sports.add("Hockey");
-    	FeedCategory newCategory = new FeedCategory();					
-    	//Set<FeedCategory> childCategories = new HashSet<FeedCategory>();
-    	//create parent category
-    	newCategory = createCategory(1100L, "Sports", null, 0, null );
-    	/*create sub categories
-    	for(int i = 0; i < SIZE_OF_LIST; i++){
-    		childCategories.add(createCategory(new Long(1100+i), sports.get(i), newCategory, 0, null ));
-    	}*/
-    	//newCategory.setChildren(childCategories);
-    	return newCategory;
-    }
-    
-    private void shadowRead(){
-    	
-    }
-    
-    private void checkInconsistencies(){
-    	
-    }
-    
-    private FeedCategory createCategory(Long id, String name, FeedCategory parent, 
-    		int position, Set<FeedSubscription> subscriptions  ){
-    
-    	FeedCategory newCategory = new FeedCategory();
-    	newCategory.setId(id);
-    	newCategory.setName(name);
-    	newCategory.setParent(parent);
-    	newCategory.setPosition(0);
-    	newCategory.setSubscriptions(subscriptions);
-    	newCategory.setUser(testUser);
-    	
-    	return newCategory;
+    	storage.loadStorage();
+    	assertEquals("American News", storage.read(1000L).getName());
+    	storage.read(1000L).setName("Canadian News");
+    	feedCategoryStorage.loadStorage(storage);
+    	newCategory = feedCategoryStorage.findById(testUser, 1000L);
+		assertEquals("American News", newCategory.getName());
     }
     	
 }
