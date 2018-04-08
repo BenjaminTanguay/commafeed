@@ -101,14 +101,11 @@ public class FixedSizeSortedSetTest {
 	@Test
     public void testLastWithEmptySet(){
 	    try{
-	        set.last();
+	            Assert.assertTrue(set.last() == null);
         }catch (Exception ee){
 	        ee.printStackTrace();
             Assert.fail();
-
         }
-
-
     }
 
     /**

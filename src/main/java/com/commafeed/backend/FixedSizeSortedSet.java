@@ -36,8 +36,12 @@ public class FixedSizeSortedSet<E> {
 	}
 
 	public E last() {
-
-		return inner.get(inner.size() - 1);
+	    // Refactor Task, prevent exception throw
+        if(inner.isEmpty()){
+            return null;
+        }else{
+            return inner.get(inner.size() - 1);
+        }
 	}
 
 	public boolean isFull() {
