@@ -81,7 +81,6 @@ public class FixedSizeSortedSetTest {
 
 	@Test
 	public void testLast() {
-	    set.isFull();
 		set.add("0");
 		set.add("1");
 		set.add("2");
