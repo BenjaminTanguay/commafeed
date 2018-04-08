@@ -95,6 +95,8 @@ public class FixedSizeSortedSetTest {
     /**
      * The custom made fixedSizeSortedSet should handle/declare exception from empty
      * upon getting .last() call, at least we should warn that the method could throw an exception
+     *
+     * Refactor: As .last() is returning an object, let's return "null" if the current set is null
      */
 	@Test
     public void testLastWithEmptySet(){
@@ -112,6 +114,8 @@ public class FixedSizeSortedSetTest {
     /**
      * The custom made fixedSizeSortedSet should handle/declare exception from empty
      * upon getting .isFull(), at least we should warn that the method could throw an exception
+     *
+     * Refactor: As isFull return a Boolean, let's throw an exception if the set is not initialized
      */
     @Test
     public void testIsFullWithEmptySet(){
