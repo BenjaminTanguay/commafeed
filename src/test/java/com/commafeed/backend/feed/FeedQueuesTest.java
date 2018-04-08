@@ -4,12 +4,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.commafeed.CommaFeedConfiguration;
 import com.commafeed.backend.dao.FeedDAO;
 import com.commafeed.backend.model.Feed;
-import com.commafeed.backend.service.FeedService;
-import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.SessionFactory;
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Queue;
