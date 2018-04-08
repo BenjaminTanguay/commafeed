@@ -44,7 +44,7 @@ public class FixedSizeSortedSet<E> {
         }
 	}
 
-	public boolean isFull() {
+	public boolean isFull(){
 		return inner.size() == capacity;
 	}
 

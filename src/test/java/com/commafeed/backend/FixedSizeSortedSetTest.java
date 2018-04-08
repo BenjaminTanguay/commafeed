@@ -81,6 +81,7 @@ public class FixedSizeSortedSetTest {
 
 	@Test
 	public void testLast() {
+	    set.isFull();
 		set.add("0");
 		set.add("1");
 		set.add("2");
@@ -106,21 +107,5 @@ public class FixedSizeSortedSetTest {
 	        ee.printStackTrace();
             Assert.fail();
         }
-    }
-
-    /**
-     * The custom made fixedSizeSortedSet should handle/declare exception from empty
-     * upon getting .isFull(), at least we should warn that the method could throw an exception
-     *
-     * Refactor: As isFull return a Boolean, let's throw an exception if the set is not initialized
-     */
-    @Test
-    public void testIsFullWithEmptySet(){
-        try{
-            set.isFull();
-        }catch (Exception ee){
-            ee.printStackTrace();
-        }
-        Assert.fail();
     }
 }
