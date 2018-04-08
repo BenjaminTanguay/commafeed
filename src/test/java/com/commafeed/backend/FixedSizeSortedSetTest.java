@@ -91,4 +91,35 @@ public class FixedSizeSortedSetTest {
 
 		Assert.assertEquals("2", set.last());
 	}
+
+    /**
+     * The custom made fixedSizeSortedSet should handle/declare exception from empty
+     * upon getting .last() call, at least we should warn that the method could throw an exception
+     */
+	@Test
+    public void testLastWithEmptySet(){
+	    try{
+	        set.last();
+        }catch (Exception ee){
+	        ee.printStackTrace();
+            Assert.fail();
+
+        }
+
+
+    }
+
+    /**
+     * The custom made fixedSizeSortedSet should handle/declare exception from empty
+     * upon getting .isFull(), at least we should warn that the method could throw an exception
+     */
+    @Test
+    public void testIsFullWithEmptySet(){
+        try{
+            set.isFull();
+        }catch (Exception ee){
+            ee.printStackTrace();
+        }
+        Assert.fail();
+    }
 }
