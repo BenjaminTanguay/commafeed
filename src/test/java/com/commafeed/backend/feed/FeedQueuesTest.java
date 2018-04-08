@@ -41,7 +41,6 @@ public class FeedQueuesTest {
         takeQueue = mock(ConcurrentLinkedQueue.class);
         giveBackQueue = mock(ConcurrentLinkedQueue.class);
     }
-    @Ignore
     @Test
     public void testTake(){
         //Badly formulated test
@@ -52,7 +51,6 @@ public class FeedQueuesTest {
         verify(fakeFeedQueues, times(1)).take();
 
     }
-    @Ignore
     @Test
     public void testAdd(){
 
@@ -77,7 +75,6 @@ public class FeedQueuesTest {
 
         verify(addQueue).add(any());
     }
-    @Ignore
     @Test
     public void testRefill(){
         //create a fake feed queues objects by mocking
