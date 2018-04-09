@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 
 import org.hibernate.SessionFactory;
 
+import com.commafeed.backend.dao.datamigrationtoggles.MigrationToggles;
 import com.commafeed.backend.model.Feed;
 import com.commafeed.backend.model.FeedCategory;
 import com.commafeed.backend.model.FeedSubscription;
@@ -22,6 +23,7 @@ import com.querydsl.jpa.hibernate.HibernateQuery;
 public class FeedSubscriptionDAO extends GenericDAO<FeedSubscription> {
 
 	private QFeedSubscription sub = QFeedSubscription.feedSubscription;
+	private User user = new User();
 
 	@Inject
 	public FeedSubscriptionDAO(SessionFactory sessionFactory) {
@@ -77,4 +79,28 @@ public class FeedSubscriptionDAO extends GenericDAO<FeedSubscription> {
 		}
 		return sub;
 	}
+	
+	// Forklift data
+	public void forkLift(){
+		if(MigrationToggles.isForkLiftOn()){
+			List<FeedSubscription> feedSubs = findAll(user);
+			for(FeedSubscription subs: feedSubs){
+				saveOrUpdate(subs);
+			}
+		}
+	}
+	
+	// Consistency Check
+	public int checkInconsistencies() {
+		int inconsistencies = 0;
+		if (!(MigrationToggles.isForkLiftOn())) {
+			System.out.println("Forklift off.");
+			return 0;
+	} else { 
+		//TODO real check
+		inconsistencies ++;
+		}
+		return inconsistencies;	
+	}
+	
 }
