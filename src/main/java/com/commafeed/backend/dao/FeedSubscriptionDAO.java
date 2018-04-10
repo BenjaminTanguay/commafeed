@@ -23,7 +23,6 @@ import com.querydsl.jpa.hibernate.HibernateQuery;
 public class FeedSubscriptionDAO extends GenericDAO<FeedSubscription> {
 
 	private QFeedSubscription sub = QFeedSubscription.feedSubscription;
-	private User user = new User();
 
 	@Inject
 	public FeedSubscriptionDAO(SessionFactory sessionFactory) {
@@ -80,10 +79,15 @@ public class FeedSubscriptionDAO extends GenericDAO<FeedSubscription> {
 		return sub;
 	}
 	
+	// Helper method to retrieve all Subscriptions
+	public List<FeedSubscription> findAll() {
+		return query().selectFrom(sub).fetch();
+	}
+	
 	// Forklift data
 	public void forkLift(){
 		if(MigrationToggles.isForkLiftOn()){
-			List<FeedSubscription> feedSubs = findAll(user);
+			List<FeedSubscription> feedSubs = findAll();
 			for(FeedSubscription subs: feedSubs){
 				saveOrUpdate(subs);
 			}
@@ -93,13 +97,13 @@ public class FeedSubscriptionDAO extends GenericDAO<FeedSubscription> {
 	// Consistency Check
 	public int checkInconsistencies() {
 		int inconsistencies = 0;
-		if (!(MigrationToggles.isForkLiftOn())) {
-			System.out.println("Forklift off.");
-			return 0;
-	} else { 
-		//TODO real check
-		inconsistencies ++;
-		}
+		if (MigrationToggles.isConsistencyCheckerOn()) {
+			List<FeedSubscription> feedSubs = findAll();
+			for (FeedSubscription fsubs : feedSubs) {
+				if (!this.storage.isModelConsistent(fsubs));
+					++inconsistencies;
+			}
+	} 
 		return inconsistencies;	
 	}
 	

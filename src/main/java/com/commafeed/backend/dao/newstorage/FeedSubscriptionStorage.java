@@ -8,7 +8,7 @@ import com.commafeed.backend.model.FeedSubscription;
 public class FeedSubscriptionStorage implements IStorageModelDAO<FeedSubscription> {
 
 
-	//private FeedSubscription feedSub;
+	
 	private GenericStorage<Long, FeedSubscription> storage;
 	private static FeedSubscriptionStorage instance;
 	
@@ -70,13 +70,13 @@ public class FeedSubscriptionStorage implements IStorageModelDAO<FeedSubscriptio
 	}
 
 	@Override
-	public boolean isModelConsistent(FeedSubscription feedSub) {
-		FeedSubscription fsImport = read(feedSub);
-        if(feedSub.equals(fsImport)){
+	public boolean isModelConsistent(FeedSubscription model) {
+		FeedSubscription fsImport = read(model);
+        if(model.equals(fsImport)){
             return true;
         }else{
-            update(feedSub);
-            verification(feedSub, fsImport);
+            update(model);
+            verification(model, fsImport);
 		return false;
         }
 	}
