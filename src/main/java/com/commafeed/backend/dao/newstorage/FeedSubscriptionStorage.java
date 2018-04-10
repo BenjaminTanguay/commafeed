@@ -1,6 +1,7 @@
 package com.commafeed.backend.dao.newstorage;
 
 
+import com.commafeed.backend.dao.datamigrationtoggles.MigrationToggles;
 import com.commafeed.backend.dao.newstorage.GenericStorage;
 import com.commafeed.backend.model.FeedSubscription;
 
@@ -71,6 +72,7 @@ public class FeedSubscriptionStorage implements IStorageModelDAO<FeedSubscriptio
 
 	@Override
 	public boolean isModelConsistent(FeedSubscription model) {
+		if (MigrationToggles.isConsistencyCheckerOn()) {
 		FeedSubscription fsImport = read(model);
         if(model.equals(fsImport)){
             return true;
@@ -79,6 +81,8 @@ public class FeedSubscriptionStorage implements IStorageModelDAO<FeedSubscriptio
             verification(model, fsImport);
 		return false;
         }
+       }
+		return true;
 	}
 	
     private void verification(FeedSubscription expectedSubFeed, FeedSubscription importSubFeed) {
