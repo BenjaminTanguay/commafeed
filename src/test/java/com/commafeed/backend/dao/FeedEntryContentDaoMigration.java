@@ -34,9 +34,7 @@ public class FeedEntryContentDaoMigration extends AbstractDAOTest{
 	private QFeedEntry entry = QFeedEntry.feedEntry;
 	
 	@BeforeClass
-    public static void beforeClass() {
-		//entry = new QFeedEntry(createSessionFactory(QFeedEntry.class));
-		
+    public static void beforeClass() {	
 		FeedEntryContentDAO feeds = new FeedEntryContentDAO(createSessionFactory(FeedEntryContent.class));
     }
 
@@ -57,8 +55,7 @@ public class FeedEntryContentDaoMigration extends AbstractDAOTest{
 	
 	@Test
 	public void test() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
-		
-		
+				
 	}
 
 }
