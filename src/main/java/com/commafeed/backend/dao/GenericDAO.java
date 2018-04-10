@@ -115,7 +115,9 @@ public abstract class GenericDAO<Model extends AbstractModel> extends AbstractDA
 		return models.size();
 	}
 
-	private void saveOrUpdateToStorage(Model model) {
+
+	protected void saveOrUpdateToStorage(Model model) {
+
 		boolean isModelAlreadyInStorage = this.storage.exists(model);
 		if (isModelAlreadyInStorage) {
 			this.storage.update(model);
@@ -134,4 +136,8 @@ public abstract class GenericDAO<Model extends AbstractModel> extends AbstractDA
 	public void supercedeIStorageModelDAOForTests(IStorageModelDAO storage) {
 		this.storage = storage;
 	}
+
+
+
 }
+
