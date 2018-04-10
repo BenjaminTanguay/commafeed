@@ -10,7 +10,8 @@ import java.util.HashMap;
 import com.commafeed.backend.model.FeedEntry;
 
 public class FeedEntryContentHashStorage {
-	HashMap<Integer, FeedEntryContent> hashMap = new HashMap<>();
+	
+	public HashMap<Integer, FeedEntryContent> hashMap = new HashMap<>();
 	
 	public FeedEntryContent Content(int key) {
 		return this.hashMap.get(key);
@@ -25,5 +26,13 @@ public class FeedEntryContentHashStorage {
 		
 	public void persistStorage(String filename) {
 		SerializeHashMap.persistMap(hashMap, filename);
+	}
+	public void loadStorage(String filename) {
+		// TODO Auto-generated method stub
+		
+	}
+	public FeedEntryContent contents(int key) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
