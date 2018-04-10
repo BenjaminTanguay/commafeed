@@ -1,5 +1,6 @@
 package com.commafeed.backend.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -9,6 +10,7 @@ import javax.inject.Singleton;
 
 import org.hibernate.SessionFactory;
 
+import com.commafeed.backend.dao.datamigrationtoggles.MigrationToggles;
 import com.commafeed.backend.model.FeedCategory;
 import com.commafeed.backend.model.QFeedCategory;
 import com.commafeed.backend.model.QUser;
@@ -19,12 +21,26 @@ import com.querydsl.core.types.Predicate;
 public class FeedCategoryDAO extends GenericDAO<FeedCategory> {
 
 	private QFeedCategory category = QFeedCategory.feedCategory;
+	private HashMap<Long, FeedCategory> longTermHashMap;
 
 	@Inject
 	public FeedCategoryDAO(SessionFactory sessionFactory) {
 		super(sessionFactory);
 	}
 
+	public List<FeedCategory> findAll() {
+		return query().selectFrom(category).fetch();
+	}
+	
+	public void forklift(User user){
+		if(MigrationToggles.isForkLiftOn()){
+			List<FeedCategory> categories = findAll(user);
+			for(FeedCategory category : categories){
+				saveOrUpdateToStorage(category);
+			}
+		}
+	}
+	
 	public List<FeedCategory> findAll(User user) {
 		return query().selectFrom(category).where(category.user.eq(user)).join(category.user, QUser.user).fetchJoin().fetch();
 	}
@@ -72,4 +88,20 @@ public class FeedCategoryDAO extends GenericDAO<FeedCategory> {
 		return isChild;
 	}
 
+	public int consistencyChecker(User user) {
+		int inconsistencyCounter = 0;
+		if (MigrationToggles.isConsistencyCheckerOn()) {
+			List<FeedCategory> categories = findAll(user);
+			for(FeedCategory category: categories) {
+				if (!this.storage.isModelConsistent(category)) {
+					++inconsistencyCounter;
+				}
+			}
+		}
+		return inconsistencyCounter;
+	}
+
+	public void setLongTermHashMap(HashMap<Long, FeedCategory> hashMap) {
+		this.longTermHashMap = hashMap;
+	}
 }
