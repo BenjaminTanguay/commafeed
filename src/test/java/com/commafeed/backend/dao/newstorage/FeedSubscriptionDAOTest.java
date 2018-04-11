@@ -30,6 +30,8 @@ public class FeedSubscriptionDAOTest extends AbstractDAOTest {
 	private FeedSubscriptionStorage feedSubscriptionStorage;
 	
 	private static User user;
+	private static Feed feed1;
+	private static Feed feed2;
 	private static FeedSubscription feedSub1;
 	private static FeedSubscription feedSub2;
 	
@@ -67,13 +69,16 @@ public class FeedSubscriptionDAOTest extends AbstractDAOTest {
 		MigrationToggles.turnForkLiftOn();
 		
 		user = new User();
+		feed1 = new Feed();
+		feed2 = new Feed();
 		
 		// Add subscriptions
-		feedSub1 = addFeedSubscription(user, "Sub1");
-		feedSub2 = addFeedSubscription(user, "Sub2");
+		feedSub1 = addFeedSubscription(user, feed1, "Sub1");
+		feedSub2 = addFeedSubscription(user, feed2, "Sub2");
 		
 		feedSubscriptionDAO.saveOrUpdate(feedSub1);
 		feedSubscriptionDAO.saveOrUpdate(feedSub2);
+		
 		feedSubscriptionDAO.forkLift();
 		
 		feedSubscriptionDAO.delete(feedSub1);
@@ -83,13 +88,53 @@ public class FeedSubscriptionDAOTest extends AbstractDAOTest {
 		 assert(this.feedSubscriptionStorage.exists(feedSub2));
 		 assert(this.feedSubscriptionStorage.read(feedSub1).equals(feedSub1));
 		 assert(this.feedSubscriptionStorage.read(feedSub2).equals(feedSub2));
+ 
 	}
 	
-	private FeedSubscription addFeedSubscription(User user, String title) {
+	@Test
+	public void testConsistency() {
+		MigrationToggles.turnConsistencyCheckerOn();
+		
+		user = new User();
+		feed1 = new Feed();
+		feed2 = new Feed();
+		
+		// Add subscriptions
+		feedSub1 = addFeedSubscription(user, feed1, "Sub1");
+		feedSub2 = addFeedSubscription(user, feed2, "Sub2");
+		
+		feedSubscriptionDAO.saveOrUpdate(feedSub1);
+		feedSubscriptionDAO.saveOrUpdate(feedSub2);
+		
+		feedSubscriptionDAO.forkLift();
+		
+		 assert(this.feedSubscriptionStorage.exists(feedSub1));
+		 assert(this.feedSubscriptionStorage.exists(feedSub2));
+		 assert(this.feedSubscriptionStorage.read(feedSub1).equals(feedSub1));
+		 assert(this.feedSubscriptionStorage.read(feedSub2).equals(feedSub2));
+		 
+		 // Corrupt data by updating storage with a different subscription
+		 Feed feed3 = new Feed();
+		 FeedSubscription feedSub3 = addFeedSubscription(user, feed3, "Sub3");
+		 feedSub3.setId(feedSub2.getId());
+		 
+		 this.feedSubscriptionStorage.update(feedSub3);
+		 
+		 // Check that the method catches the inconsistency
+		 assertEquals(1, feedSubscriptionDAO.checkInconsistencies());
+		 
+		 // Check that the method updated the model (no inconsistency)
+		 assertEquals(0, feedSubscriptionDAO.checkInconsistencies());
+		 
+		 feedSubscriptionDAO.delete(feedSub2);
+	}
+	
+	
+	private FeedSubscription addFeedSubscription(User user, Feed feed, String title) {
 		FeedSubscription newSub = new FeedSubscription();
 		
 		newSub.setUser(user);
-		newSub.setFeed(null);
+		newSub.setFeed(feed);
 		newSub.setTitle(title);
 		newSub.setCategory(null);
 		newSub.setStatuses(null);
