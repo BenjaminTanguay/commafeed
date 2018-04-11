@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -178,6 +179,14 @@ public class UserDAOTest extends AbstractDAOTest {
     @Test
     public void testReadAndWriteMigration() {
         MigrationToggles.turnShadowReadsOn();
+
+        // Pulling from the database all the existing user in case some
+        // already exists. This should populate the storage.
+        Collection<User> users = userDAO.findAll();
+
+        for (User userAlreadyInDb: users) {
+            this.userStorage.create(userAlreadyInDb);
+        }
 
         // Putting some users in the database and local storage
         user1 = getUser("Hello", "hello@gmail.com");
