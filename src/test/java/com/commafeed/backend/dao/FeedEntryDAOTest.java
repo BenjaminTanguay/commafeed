@@ -200,6 +200,110 @@ public class FeedEntryDAOTest extends AbstractDAOTest {
         feedEntryDAO.delete(feedEntry2);
     }
 
+    @Test
+    public void testReadAndWriteMigration() {
+        MigrationToggles.turnShadowReadsOn();
+
+        //Putting some feedEntry in the database and local storage
+        feedEntry1 = getFeedEntry("guid2", "url1");
+        feedEntryDAO.saveOrUpdate(feedEntry1);
+        feedEntry2 = getFeedEntry("guid2", "url2");
+        feedEntryDAO.saveOrUpdate(feedEntry2);
+
+        //nb of entries in the database
+        int totalEntry = feedEntryDAO.findAll().size();
+
+        // is storage is ok
+        assert(this.storage.exists(feedEntry1));
+        assert(this.storage.exists(feedEntry2));
+        assert(this.storage.read(feedEntry1).equals(feedEntry1));
+        assert(this.storage.read(feedEntry2).equals(feedEntry2));
+
+        // Corrupting the data in the datastorage
+        FeedEntry feedEntry3 = getFeedEntry("guid3", "url3");
+        feedEntry3.setId(feedEntry1.getId());
+        this.storage.update(feedEntry3);
+        FeedEntry feedEntry4 = getFeedEntry("guid4", "url4");
+        feedEntry4.setId(feedEntry2.getId());
+        this.storage.update(feedEntry4);
+
+        int inconsistencyCounter = 0;
+        double threshold = 1;
+
+        //should be two inconsistencies
+        assertEquals(2, inconsistencyCounter = feedEntryDAO.consistencyChecker());
+        int entriesChecked = 0;
+        do {
+            entriesChecked += totalEntry;
+
+            threshold = inconsistencyCounter / totalEntry;
+
+            //should be no inconsistency
+            assertEquals(0, inconsistencyCounter = feedEntryDAO.consistencyChecker());
+
+        } while(threshold > 0.01);
+
+        // inconsistencies are below a certain threshold, discard the old database
+        MigrationToggles.turnReadAndWriteOn();
+
+        // Removing the feedEntry1 from the storage
+        feedEntryDAO.delete(feedEntry1);
+        assert(!this.storage.exists(feedEntry1));
+
+        // Turning off the toggles to check that the feedEntry1 in the db wasn't
+        // affected
+        MigrationToggles.turnAllTogglesOff();
+
+        // Getting the feedEntry1 from the database
+        FeedEntry feedEntry6 = feedEntryDAO.findById(feedEntry1.getId());
+        // Result should be equal to feedEntry 1
+        assertEquals(feedEntry1, feedEntry6);
+
+        feedEntryDAO.delete(feedEntry1);
+        feedEntryDAO.delete(feedEntry2);
+    }
+
+
+    @Test
+    public void testLongTermConsistencyCheck() {
+        MigrationToggles.turnLongTermConsistencyOn();
+
+        // Putting some feedEntrys in the database
+        feedEntry1 = getFeedEntry("guid1", "url1");
+        feedEntry1.setId(1L);
+        feedEntryDAO.saveOrUpdate(feedEntry1);
+        feedEntry2 = getFeedEntry("guid2", "url2");
+        feedEntry2.setId(2L);
+        feedEntryDAO.saveOrUpdate(feedEntry2);
+
+        HashMap<Long, FeedEntry> longTermHashMapConsistencyChecker = new HashMap<Long, FeedEntry>();
+
+        longTermHashMapConsistencyChecker.put(feedEntry1.getId(), feedEntry1);
+        longTermHashMapConsistencyChecker.put(feedEntry2.getId(), feedEntry2);
+
+        feedEntryDAO.setLongTermHashMap(longTermHashMapConsistencyChecker);
+
+        // Checking that the data in the storage is ok
+        assert(this.storage.exists(feedEntry1));
+        assert(this.storage.exists(feedEntry2));
+        assert(this.storage.read(feedEntry1).equals(feedEntry1));
+        assert(this.storage.read(feedEntry2).equals(feedEntry2));
+
+        // Corrupting the data in the datastorage
+        FeedEntry feedEntry3 = getFeedEntry("guid3", "url3");
+        feedEntry3.setId(feedEntry1.getId());
+        this.storage.update(feedEntry3);
+        FeedEntry feedEntry4 = getFeedEntry("guid4", "url4");
+        feedEntry4.setId(feedEntry2.getId());
+        this.storage.update(feedEntry4);
+
+        //Two inconsistencies first time,
+        assertEquals(2, feedEntryDAO.consistencyChecker());
+
+        //no inconsistency second time,
+        assertEquals(0, feedEntryDAO.consistencyChecker());
+    }
+
     public static Feed getFeed(){
         feed = new Feed();
         Date date = new Date();

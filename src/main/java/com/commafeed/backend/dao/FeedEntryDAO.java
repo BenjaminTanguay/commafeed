@@ -1,6 +1,7 @@
 package com.commafeed.backend.dao;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ import lombok.Getter;
 public class FeedEntryDAO extends GenericDAO<FeedEntry> {
 
 	private QFeedEntry entry = QFeedEntry.feedEntry;
+	private HashMap<Long, FeedEntry> longTermHashMap;
 
 	@Inject
 	public FeedEntryDAO(SessionFactory sessionFactory) {
@@ -89,5 +91,9 @@ public class FeedEntryDAO extends GenericDAO<FeedEntry> {
 			}
 		}
 		return inconsistencyCounter;
+	}
+
+	public void setLongTermHashMap(HashMap<Long, FeedEntry> hashMap) {
+		this.longTermHashMap = hashMap;
 	}
 }
