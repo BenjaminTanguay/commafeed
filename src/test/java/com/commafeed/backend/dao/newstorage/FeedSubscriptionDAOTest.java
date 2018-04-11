@@ -207,6 +207,65 @@ public class FeedSubscriptionDAOTest extends AbstractDAOTest {
 		 feedSubscriptionDAO.delete(feedSub2);
 	}
 	
+	@Test
+	public void testReadandWriteMigration() {
+		MigrationToggles.turnShadowReadsOn();
+		
+		user = new User();
+		
+		// Add some data to both db and storage and test
+		feed1 = new Feed();
+		feed2 = new Feed();
+		feedSub1 = addFeedSubscription(user, feed1, "Sub1");
+		feedSubscriptionDAO.saveOrUpdate(feedSub1);
+		feedSub2 = addFeedSubscription(user, feed2, "Sub2");
+		feedSubscriptionDAO.saveOrUpdate(feedSub2);
+		
+		 assert(this.feedSubscriptionStorage.exists(feedSub1));
+		 assert(this.feedSubscriptionStorage.exists(feedSub2));
+		 assert(this.feedSubscriptionStorage.read(feedSub1).equals(feedSub1));
+		 assert(this.feedSubscriptionStorage.read(feedSub2).equals(feedSub2));
+		 
+		 // Break data
+		Feed feed3 =  new Feed();
+		FeedSubscription feedSub3 = addFeedSubscription(user, feed3,"Sub3");
+		feedSub3.setId(feedSub2.getId());
+		this.feedSubscriptionStorage.update(feedSub3);
+		Feed feed4 = new Feed();
+		FeedSubscription feedSub4 = addFeedSubscription(user, feed4, "Sub4");
+		feedSub4.setId(feedSub1.getId());
+		this.feedSubscriptionStorage.update(feedSub4);
+		
+		// Test the migration 
+		int entries = feedSubscriptionDAO.findAll().size();
+		int inconsistencies = 0;
+		double threshold = 1; 
+		
+		//Check inconsistencies
+		assertEquals(2, inconsistencies = feedSubscriptionDAO.checkInconsistencies());
+		int checkedEntries = 0;
+		do {
+			checkedEntries += entries;
+			threshold = inconsistencies/entries;
+			
+			assertEquals(0, inconsistencies = feedSubscriptionDAO.checkInconsistencies());
+		}
+		// Keep on doing checks until we are below chosen threshold
+		while(threshold > 0.01);
+		
+		
+		MigrationToggles.turnReadAndWriteOn();
+		feedSubscriptionDAO.delete(feedSub1);
+		assert(!this.feedSubscriptionStorage.exists(feedSub1));
+		
+		MigrationToggles.turnAllTogglesOff();
+		
+		FeedSubscription feedSub6 = feedSubscriptionDAO.findById(feedSub1.getId());
+		assertEquals(feedSub1, feedSub6);
+		
+		feedSubscriptionDAO.delete(feedSub1);
+		feedSubscriptionDAO.delete(feedSub2);
+	}
 	
 	
 	private FeedSubscription addFeedSubscription(User user, Feed feed, String title) {
