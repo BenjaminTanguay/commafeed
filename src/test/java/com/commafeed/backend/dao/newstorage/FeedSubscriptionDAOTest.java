@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Before;
@@ -72,18 +73,20 @@ public class FeedSubscriptionDAOTest extends AbstractDAOTest {
 		feed1 = new Feed();
 		feed2 = new Feed();
 		
-		// Add subscriptions
+		// Add subscriptions to database
 		feedSub1 = addFeedSubscription(user, feed1, "Sub1");
 		feedSub2 = addFeedSubscription(user, feed2, "Sub2");
 		
 		feedSubscriptionDAO.saveOrUpdate(feedSub1);
 		feedSubscriptionDAO.saveOrUpdate(feedSub2);
 		
+		// Add subs to storage
 		feedSubscriptionDAO.forkLift();
 		
 		feedSubscriptionDAO.delete(feedSub1);
 		feedSubscriptionDAO.delete(feedSub2);
 		
+		// Test if everything is right
 		 assert(this.feedSubscriptionStorage.exists(feedSub1));
 		 assert(this.feedSubscriptionStorage.exists(feedSub2));
 		 assert(this.feedSubscriptionStorage.read(feedSub1).equals(feedSub1));
@@ -128,6 +131,82 @@ public class FeedSubscriptionDAOTest extends AbstractDAOTest {
 		 
 		 feedSubscriptionDAO.delete(feedSub2);
 	}
+	
+	@Test
+	public void testShadowReads() {
+		MigrationToggles.turnShadowReadsOn();
+		
+		// Add and test storage and database data 
+		user = new User();
+		feed1 = new Feed();
+		feed2 = new Feed();
+
+		feedSub1 = addFeedSubscription(user, feed1, "Sub1");
+		feedSub2 = addFeedSubscription(user, feed2, "Sub2");
+		
+		feedSubscriptionDAO.saveOrUpdate(feedSub1);
+		feedSubscriptionDAO.saveOrUpdate(feedSub2);
+		
+		feedSubscriptionDAO.forkLift();
+		
+		 assert(this.feedSubscriptionStorage.exists(feedSub1));
+		 assert(this.feedSubscriptionStorage.exists(feedSub2));
+		 assert(this.feedSubscriptionStorage.read(feedSub1).equals(feedSub1));
+		 assert(this.feedSubscriptionStorage.read(feedSub2).equals(feedSub2));
+		 
+		 // Read db and create a new subscription with pulled data
+		FeedSubscription feedSub3 = feedSubscriptionDAO.findById(feedSub1.getId());
+		
+		assert(feedSub3.equals(feedSub1));
+		
+		// Corrupt the storage data with some new data
+		Feed feed4 = new Feed();
+		FeedSubscription feedSub4 = addFeedSubscription(user, feed4, "Fake News");
+		feedSub4.setId(feedSub2.getId());
+		this.feedSubscriptionStorage.update(feedSub4);
+		
+		assertNotEquals(feedSub4, feedSub2);
+		
+		// Fix the corrupted data
+		FeedSubscription feedSub5 = feedSubscriptionDAO.findById(feedSub2.getId());
+		assertEquals(feedSub2, feedSub5);
+		
+		// Waiting for the asynchronous call to finish
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(this.feedSubscriptionStorage.read(feedSub4.getId()), feedSub5);
+
+        feedSubscriptionDAO.delete(feedSub1);
+        feedSubscriptionDAO.delete(feedSub2);
+	}
+	
+	@Test
+	public void testShadowWrites() {
+		MigrationToggles.turnShadowWritesOn();
+		
+		// Add and test storage and database data 
+		user = new User();
+		feed1 = new Feed();
+		feed2 = new Feed();
+
+		feedSub1 = addFeedSubscription(user, feed1, "Sub1");
+		feedSub2 = addFeedSubscription(user, feed2, "Sub2");
+		feedSubscriptionDAO.saveOrUpdate(feedSub1);
+		feedSubscriptionDAO.saveOrUpdate(feedSub2);
+		
+		 assert(this.feedSubscriptionStorage.exists(feedSub1));
+		 assert(this.feedSubscriptionStorage.exists(feedSub2));
+		 assert(this.feedSubscriptionStorage.read(feedSub1).equals(feedSub1));
+		 assert(this.feedSubscriptionStorage.read(feedSub2).equals(feedSub2));
+		 
+		 feedSubscriptionDAO.delete(feedSub1);
+		 feedSubscriptionDAO.delete(feedSub2);
+	}
+	
 	
 	
 	private FeedSubscription addFeedSubscription(User user, Feed feed, String title) {
