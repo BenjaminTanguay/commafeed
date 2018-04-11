@@ -85,7 +85,7 @@ database:
   driverClass: com.mysql.jdbc.Driver
   url: jdbc:mysql://localhost/commafeed?autoReconnect=true&failOverReadOnly=false&maxReconnects=20&rewriteBatchedStatements=true
   user: root
-  password:
+  password: newpassword
   properties:
     charSet: UTF-8
   validationQuery: "/* CommaFeed Health Check */ SELECT 1"

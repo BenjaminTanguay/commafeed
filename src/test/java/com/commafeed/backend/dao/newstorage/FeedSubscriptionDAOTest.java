@@ -37,13 +37,6 @@ public class FeedSubscriptionDAOTest extends AbstractDAOTest {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		// Create a user to set subscriptions to
-		userDAO = new UserDAO(createSessionFactory(User.class));
-		
-		beginTransaction();
-		user = userDAO.findByName("admin");
-		closeTransaction();
-		
 		// Classes needed to create a FeedSubscriptionDAO
 		classes.add(User.class);
 		classes.add(Feed.class);
@@ -73,6 +66,8 @@ public class FeedSubscriptionDAOTest extends AbstractDAOTest {
 	public void testForklift() {
 		MigrationToggles.turnForkLiftOn();
 		
+		user = new User();
+		
 		// Add subscriptions
 		feedSub1 = addFeedSubscription(user, "Sub1");
 		feedSub2 = addFeedSubscription(user, "Sub2");
@@ -81,9 +76,13 @@ public class FeedSubscriptionDAOTest extends AbstractDAOTest {
 		feedSubscriptionDAO.saveOrUpdate(feedSub2);
 		feedSubscriptionDAO.forkLift();
 		
-		assert(this.feedSubscriptionStorage.exists(feedSub1));
-		assert(this.feedSubscriptionStorage.exists(feedSub2));
+		feedSubscriptionDAO.delete(feedSub1);
+		feedSubscriptionDAO.delete(feedSub2);
 		
+		 assert(this.feedSubscriptionStorage.exists(feedSub1));
+		 assert(this.feedSubscriptionStorage.exists(feedSub2));
+		 assert(this.feedSubscriptionStorage.read(feedSub1).equals(feedSub1));
+		 assert(this.feedSubscriptionStorage.read(feedSub2).equals(feedSub2));
 	}
 	
 	private FeedSubscription addFeedSubscription(User user, String title) {

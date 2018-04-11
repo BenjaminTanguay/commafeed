@@ -57,7 +57,7 @@ public class FeedSubscriptionStorage implements IStorageModelDAO<FeedSubscriptio
 
 	@Override
 	public FeedSubscription delete(FeedSubscription feedSub) {
-		return this.storage.delete(feedSub.getId(), feedSub);
+		return this.storage.delete(feedSub.getId());
 	}
 
 	@Override
