@@ -8,6 +8,9 @@ import org.junit.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 public class FeedEntryDAOTest extends AbstractDAOTest {
 
     private static FeedEntryDAO feedEntryDAO;
@@ -84,6 +87,43 @@ public class FeedEntryDAOTest extends AbstractDAOTest {
     }
 
     @Test
+    public void testConsistencyCheck() {
+        MigrationToggles.turnConsistencyCheckerOn();
+
+        // Putting some feedEntry in the database
+        feedEntry1 = getFeedEntry("guid1", "url1");
+        feedEntryDAO.saveOrUpdate(feedEntry1);
+        feedEntry2 = getFeedEntry("guid2", "url2");
+        feedEntryDAO.saveOrUpdate(feedEntry2);
+
+        // Forklifting the data from the database to the storage
+        feedEntryDAO.forklift();
+
+        // Checking that the data in the storage is ok
+        assert(this.storage.exists(feedEntry1));
+        assert(this.storage.exists(feedEntry2));
+        assert(this.storage.read(feedEntry1).equals(feedEntry1));
+        assert(this.storage.read(feedEntry2).equals(feedEntry2));
+
+        //the data in the datastorage get corrupt
+        FeedEntry feedEntry3 = getFeedEntry("guid3", "url3");
+        feedEntry3.setId(feedEntry1.getId());
+        this.storage.update(feedEntry3);
+        FeedEntry feedEntry4 = getFeedEntry("url4", "url4");
+        feedEntry4.setId(feedEntry2.getId());
+        this.storage.update(feedEntry4);
+
+        //there should be two inconsistencies on the first time
+        assertEquals(2, feedEntryDAO.consistencyChecker());
+
+        //there should be no inconsistency on the second time
+        assertEquals(0, feedEntryDAO.consistencyChecker());
+
+        feedEntryDAO.delete(feedEntry1);
+        feedEntryDAO.delete(feedEntry2);
+    }
+
+    @Test
     public void testShadowWrite() {
         MigrationToggles.turnShadowWritesOn();
 
@@ -110,6 +150,54 @@ public class FeedEntryDAOTest extends AbstractDAOTest {
         assert (storageFeedEntry2.equals(feedEntry2));
 
         MigrationToggles.turnAllTogglesOff();
+    }
+
+    @Test
+    public void testShadowReads() {
+        MigrationToggles.turnShadowReadsOn();
+
+        // Putting some feedEntry in the database and in the storage
+        feedEntry1 = getFeedEntry("guid1", "url1");
+        feedEntryDAO.saveOrUpdate(feedEntry1);
+        feedEntry2 = getFeedEntry("guid2", "url2");
+        feedEntryDAO.saveOrUpdate(feedEntry2);
+
+        // is the storage ok
+        assert(this.storage.exists(feedEntry1));
+        assert(this.storage.exists(feedEntry2));
+        assert(this.storage.read(feedEntry1).equals(feedEntry1));
+        assert(this.storage.read(feedEntry2).equals(feedEntry2));
+
+        // Pulling data from the db with the read method
+        FeedEntry feedEntry3 = feedEntryDAO.findById(feedEntry1.getId());
+
+        assert(feedEntry3.equals(feedEntry1));
+
+        // Corrupting the data from the storage and checking that the error
+        // is automatically corrected
+        FeedEntry feedEntry4 = getFeedEntry("url4", "url4");
+        feedEntry4.setId(feedEntry2.getId());
+        this.storage.update(feedEntry4);
+
+        assertNotEquals(feedEntry4, feedEntry2);
+
+        // Reading the feedEntry
+        FeedEntry feedEntry5 = feedEntryDAO.findById(feedEntry4.getId());
+
+        // Now check if correct for the corrupted data should have been
+        assertEquals( feedEntry2, feedEntry5);
+
+        // Waiting for the asynchronous call to finish
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(this.storage.read(feedEntry4.getId()), feedEntry5);
+
+        feedEntryDAO.delete(feedEntry1);
+        feedEntryDAO.delete(feedEntry2);
     }
 
     public static Feed getFeed(){
