@@ -74,7 +74,6 @@ public class User extends AbstractModel {
 				'}';
 	}
 
-	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
@@ -130,6 +129,5 @@ public class User extends AbstractModel {
 		return getLastFullRefresh() != null ?
 				getLastFullRefresh().equals(user.getLastFullRefresh()) :
 				user.getLastFullRefresh() == null;
-
 	}
 }
