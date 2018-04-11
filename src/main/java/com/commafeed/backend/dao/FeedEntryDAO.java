@@ -1,11 +1,14 @@
 package com.commafeed.backend.dao;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.commafeed.backend.dao.datamigrationtoggles.MigrationToggles;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.SessionFactory;
 
@@ -22,6 +25,7 @@ import lombok.Getter;
 public class FeedEntryDAO extends GenericDAO<FeedEntry> {
 
 	private QFeedEntry entry = QFeedEntry.feedEntry;
+	private HashMap<Long, FeedEntry> longTermHashMap;
 
 	@Inject
 	public FeedEntryDAO(SessionFactory sessionFactory) {
@@ -56,5 +60,40 @@ public class FeedEntryDAO extends GenericDAO<FeedEntry> {
 	public static class FeedCapacity {
 		private Long id;
 		private Long capacity;
+	}
+
+	public void forklift() {
+		if (MigrationToggles.isForkLiftOn()) {
+			List<FeedEntry> feedEntries = findAll();
+			for(FeedEntry entry: feedEntries) {
+				saveOrUpdateToStorage(entry);
+			}
+		}
+	}
+
+	public int consistencyChecker() {
+		int inconsistencyCounter = 0;
+		if (MigrationToggles.isLongTermConsistencyOn()) {
+			Collection<FeedEntry> feedEntry = this.longTermHashMap.values();
+			for(FeedEntry entry: feedEntry) {
+				if (!this.storage.isModelConsistent(entry)) {
+					++inconsistencyCounter;
+				}
+			}
+		} else {
+			if (MigrationToggles.isConsistencyCheckerOn()) {
+				List<FeedEntry> feedEntry = findAll();
+				for(FeedEntry entry: feedEntry) {
+					if (!this.storage.isModelConsistent(feedEntry)) {
+						++inconsistencyCounter;
+					}
+				}
+			}
+		}
+		return inconsistencyCounter;
+	}
+
+	public void setLongTermHashMap(HashMap<Long, FeedEntry> hashMap) {
+		this.longTermHashMap = hashMap;
 	}
 }
